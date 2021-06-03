@@ -5,20 +5,20 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Time;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.client.ClientProtocolException;
 import ro.pub.cs.systems.eim.practicaltest02.general.Constants;
+import ro.pub.cs.systems.eim.practicaltest02.models.TimeModel;
 
 
 public class ServerThread extends Thread {
 
-    private boolean isRunning;
-
     private ServerSocket serverSocket;
     private Integer serverPort;
 
-    private HashMap<String, String> data = null;
+    private HashMap<String, TimeModel> data = null;
 
     public ServerThread(Integer port) {
         this.serverPort = port;
@@ -30,7 +30,7 @@ public class ServerThread extends Thread {
                 ioException.printStackTrace();
             }
         }
-        this.data = new HashMap<String, String>();
+        this.data = new HashMap<String, TimeModel>();
     }
 
 
@@ -64,11 +64,17 @@ public class ServerThread extends Thread {
         return serverSocket;
     }
 
-    /*public synchronized void setData(String city, WeatherForecastInformation weatherForecastInformation) {
-        this.data.put(city, weatherForecastInformation);
-    }*/
+    public synchronized void setData(String client, TimeModel alarmData) {
 
-    public synchronized HashMap<String, String> getData() {
+        if(alarmData == null ){
+            this.data.remove(client);
+        }
+        else {
+            this.data.put(client, alarmData);
+        }
+    }
+
+    public synchronized HashMap<String, TimeModel> getData() {
         return data;
     }
 

@@ -7,10 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ro.pub.cs.systems.eim.practicaltest02.network.ClientThread;
 import ro.pub.cs.systems.eim.practicaltest02.network.ServerThread;
 import ro.pub.cs.systems.eim.practicaltest02.general.Constants;
@@ -45,8 +43,8 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
         }
     }
 
-    private ButtonClickListenerGetResult buttonClickListenergetResult = new ButtonClickListenerGetResult();
-    private class ButtonClickListenerGetResult implements View.OnClickListener {
+    private ButtonClickListenerSet buttonClickListenerSet = new ButtonClickListenerSet();
+    private class ButtonClickListenerSet implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {
@@ -75,11 +73,73 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
             }
 
             clientThread = new ClientThread(
-                    addr, Integer.parseInt(port), hour, minute, showResult
+                    addr, Integer.parseInt(port), hour, minute, showResult, "set"
             );
             clientThread.start();
         }
     }
+
+
+    private ButtonClickListenerReSet buttonClickListenerReSet = new ButtonClickListenerReSet();
+    private class ButtonClickListenerReSet implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+
+            String port = clientPort.getText().toString();
+            String addr = clientAddr.getText().toString();
+
+            if(port.isEmpty() || port == null) {
+                Toast.makeText(getApplicationContext(), "Please fill client port", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(addr.isEmpty() || addr == null) {
+                Toast.makeText(getApplicationContext(), "Please fill client addr", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (serverThread == null || !serverThread.isAlive()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] There is no server to connect to!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            clientThread = new ClientThread(
+                    addr, Integer.parseInt(port), "", "", showResult, "reset"
+            );
+            clientThread.start();
+        }
+    }
+
+    private ButtonClickListenerPoll buttonClickListenerPoll = new ButtonClickListenerPoll();
+    private class ButtonClickListenerPoll implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+
+            String port = clientPort.getText().toString();
+            String addr = clientAddr.getText().toString();
+
+            if(port.isEmpty() || port == null) {
+                Toast.makeText(getApplicationContext(), "Please fill client port", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(addr.isEmpty() || addr == null) {
+                Toast.makeText(getApplicationContext(), "Please fill client addr", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (serverThread == null || !serverThread.isAlive()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] There is no server to connect to!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            clientThread = new ClientThread(
+                    addr, Integer.parseInt(port), "", "", showResult, "poll"
+            );
+            clientThread.start();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +155,14 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
         clientSet = findViewById(R.id.clientSet);
         clientReset = findViewById(R.id.clientReset);
         clientPoll = findViewById(R.id.clientPoll);
+
         showResult = findViewById(R.id.showResult);
 
         serverConnect.setOnClickListener(buttonClickListenerServer);
-        clientReset.setOnClickListener(buttonClickListenergetResult);
-        clientSet.setOnClickListener(buttonClickListenergetResult);
-        clientPoll.setOnClickListener(buttonClickListenergetResult);
+
+        clientSet.setOnClickListener(buttonClickListenerSet);
+        clientReset.setOnClickListener(buttonClickListenerReSet);
+        clientPoll.setOnClickListener(buttonClickListenerPoll);
 
     }
 

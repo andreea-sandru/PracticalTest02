@@ -6,6 +6,8 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import cz.msebera.android.httpclient.HttpEntity;
@@ -55,6 +57,7 @@ public class CommunicationThread extends Thread {
             String result = null;
 
                 if(command.equals("set")) {
+                    Log.i(Constants.TAG, "[COMMUNICATION THREAD] Setting time and hour...");
                     if (data.containsKey(clientAddress)) {
                         Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the cache...");
                         timeModel = data.get(clientAddress);
@@ -74,14 +77,25 @@ public class CommunicationThread extends Thread {
                     }
                 }
                 else if(command.equals("reset")) {
+                    Log.i(Constants.TAG, "[COMMUNICATION THREAD] Resetting alarm for current client ...");
                     serverThread.setData(clientAddress, null);
                     result = "Reset client alarm to null";
                 }
                 else if(command.equals("poll")) {
-                    Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the webservice...");
-                    HttpClient httpClient = new DefaultHttpClient();
-                    String pageSourceCode = "";
-                    result = "Polling data";
+                    Log.i(Constants.TAG, "[COMMUNICATION THREAD] Polling info...");
+
+                    // open new tcp connection socket with server utcnist.colorado.edu, port 13
+                    Integer eduPort = new Integer(13);
+                    Socket s = new Socket("utcnist.colorado.edu", eduPort);
+
+
+                    BufferedReader bufferedReader2 = Utilities.getReader(s);
+                    bufferedReader2.readLine();
+                    String line = bufferedReader2.readLine();
+
+                    Log.d(Constants.TAG, "The server returned: " + line);
+
+                    result = line;
                 }
 
             if (result == null) {
